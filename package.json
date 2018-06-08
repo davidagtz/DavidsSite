@@ -4,12 +4,14 @@
   "description": "A portfolio",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+	"test": "echo \"Error: no test specified\" && exit 1",
+	"start" : "startMongo.bat && node index.js"
   },
   "author": "David Gutierrez",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.3",
+    "mongodb": "^3.0.10",
     "pug": "^2.0.3",
     "sass": "^1.5.1"
   }

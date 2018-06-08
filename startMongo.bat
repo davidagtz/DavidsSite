@@ -1,0 +1,1 @@
+start mongod --auth --port 27017
