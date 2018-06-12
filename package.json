@@ -2,10 +2,10 @@
   "name": "davidswebsite",
   "version": "0.0.1",
   "description": "A portfolio",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
 	"test": "echo \"Error: no test specified\" && exit 1",
-	"start" : "startMongo.bat && start node index.js"
+	"start" : "startMongo.bat && start node server.js"
   },
   "author": "David Gutierrez",
   "license": "ISC",

@@ -69,6 +69,10 @@ mongo.connect(url, (err, databases) => {
 		});
 	});
 
+	app.all('*', (req, res) => {
+		res.sendStatus(404);
+	});
+
 	// Start the server
 	let port = process.env.port || 80
 	app.listen(port, () => console.log("Listening on port " + port));

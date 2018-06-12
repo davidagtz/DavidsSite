@@ -1,10 +1,29 @@
-#articles 
+$colorBorder: #cccccc
+
+#articles
+	margin: 10px 
 	table
 		width: 100%
-		.load
-			margin-left: auto
-			margin-right: auto
-			margin-top: 10px
-			margin-bottom: 10px
-			height: 100px
-			width: 100px
+		border-collapse: collapse
+		tbody
+			:first-child
+				td
+					border-top: none
+			tr
+				:first-child
+					border-left: none
+				td
+					border: 1px solid $colorBorder
+					padding: 2%
+					.load
+						margin-left: auto
+						margin-right: auto
+						margin-top: 10px
+						margin-bottom: 10px
+						height: 100px
+						width: 100px
+				:last-child
+					border-right: none
+			:last-child
+				td
+					border-bottom: none

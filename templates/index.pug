@@ -2,13 +2,14 @@ extends template.pug
 
 block append head
 	link(rel="stylesheet" href="/css/index.css")
+	script(src="/js/index.js")
 
 block append content
 	#articles
 		- var articlesInARow = 3
 		- var rowCount = articles.length / articlesInARow
 		table
-			tbody
+			tbody#squares
 				- for(let i = 0; i < rowCount; i++)
 					tr
 						-//#{articles[i * articlesInARow + j]}
