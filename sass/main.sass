@@ -1,0 +1,64 @@
+$padLeft: 5%
+$navUps: .5%
+$contentRight: 5%
+$marginBottom: 1%
+$colorBack: #919191
+	
+html, body
+	margin: 0
+	padding: 0
+	font-family: 'Roboto', sans-serif
+header
+	> h1
+		padding-left: $padLeft
+		font-family: 'Mr Dafoe', cursive
+		margin-bottom: 0
+		font-size: 3em
+	nav 
+		background-color: $colorBack
+		color: #FFF
+		ul
+			padding-left: $padLeft 
+			list-style: none
+			text-decoration: none
+			width: 100% - 2 * $padLeft
+			margin: 0
+			a
+				text-decoration: none
+				li
+					padding-left: 2%
+					padding-right: 2%
+					padding-top: $navUps
+					padding-bottom: $navUps
+					color: #FFF
+					display: inline-block
+					&:hover
+						background-color: #707070
+
+#content
+	width: 100% - 2 * $contentRight
+	padding-left: $contentRight
+	margin-bottom: $marginBottom
+
+footer
+	background-color: $colorBack
+	color: white
+	#info
+		height: 5%
+		padding-left: $padLeft
+		padding-top: $navUps
+		padding-bottom: $navUps
+		width: 100% - 2 * $padLeft
+		vertical-align: text-top
+		#authored
+			display: inline-block
+			vertical-align: top
+			height: 100%
+			p
+				margin: 0
+		#git
+			display: inline
+			a
+				height: 100%
+				img
+					height: 100%

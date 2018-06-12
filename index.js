@@ -4,9 +4,9 @@ const __dev__ = true;
 
 // private info
 let fs = require('fs');
-const config = fs.readFileSync('configurations.json', {
+const config = JSON.parse(fs.readFileSync('configurations.json', {
 	encoding : 'utf-8'
-});
+}));
 
 // Server Code
 let express = require('express');
@@ -29,32 +29,38 @@ function sendPug(res, file, json) {
 // Make CSS from Css preprocessor
 let sass = require('sass');
 let sassNames = ['main.sass'];
-sassNames.forEach((css) => {
-	sass.renderSync({
-		file : "sass/" + css,
-		outFile : "www/css/" + css.replace(".sass", ".css")
-	});
-});
+function renderSass(css) {
+	if(__dev__){
+		const res = sass.renderSync({
+			file: "sass/" + css
+		});
+		fs.writeFileSync("www/css/" + css.replace(".sass", ".css"), res.css);
+	}
+}
+sassNames.forEach(renderSass);
 
 // just some functions
 let throws = (err) => {if(err) throw err};
 
-
 // Connect to Database
 let mdb = require('mongodb');
-const url = "mongodb://" + config.user + ":" + config.password + "@localhost:27017/" + config.db;
+const url = "mongodb://" + config.user + ":" + config.password + "@localhost/" + config.db;
 let mongo = mdb.MongoClient;
-mongo.connect(url)
-	.then((err, databases) => {
-		throws(err);
-		let db = databases.db(config.db);
-		let admin = db.admin();
-		console.log(admin.authenticate);
-	}).catch((err) => {
-		console.log(err);
-		process.exit();
+mongo.connect(url, (err, databases) => {
+	throws(err);
+	
+	console.log("Successfully Connected");
+
+	// declarations of collections
+	let db = databases.db(config.db);
+
+	// Routing to pages
+	app.get("/", (req, res) => {
+		renderSass('main.sass');
+		sendPug(res, 'index.pug', {});
 	});
 
-// Start the server
-let port = process.env.port || 80
-app.listen(port);
+	// Start the server
+	let port = process.env.port || 80
+	app.listen(port, () => console.log("Listening on port " + port));
+});
