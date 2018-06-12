@@ -1,10 +1,11 @@
 - var title = "Mi Vida"
 html
 	head
-		link(rel="stylesheet" href="/css/main.css")
-		link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")
-		link(href="https://fonts.googleapis.com/css?family=Mr+Dafoe" rel="stylesheet")
-		title #{title}
+		block head
+			link(rel="stylesheet" href="/css/main.css")
+			link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")
+			link(href="https://fonts.googleapis.com/css?family=Mr+Dafoe" rel="stylesheet")
+			title #{title}
 	body
 		header
 			h1 #{title}

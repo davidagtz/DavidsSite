@@ -1,1 +1,17 @@
 extends template.pug
+
+block append head
+	link(rel="stylesheet" href="/css/index.css")
+
+block append content
+	#articles
+		- var articlesInARow = 3
+		- var rowCount = articles.length / articlesInARow
+		table
+			tbody
+				- for(let i = 0; i < rowCount; i++)
+					tr
+						-//#{articles[i * articlesInARow + j]}
+						-for(let j = 0; j < articlesInARow && i * articlesInARow + j < articles.length; j++)
+							td
+								.load

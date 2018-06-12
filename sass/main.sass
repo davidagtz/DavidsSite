@@ -40,6 +40,17 @@ header
 	padding-left: $contentRight
 	margin-bottom: $marginBottom
 
+.load
+	animation: load 1s linear infinite
+	border-radius: 50%
+	border-left: 2px solid orange
+	border-right: 2px solid orange
+
+
+@keyframes load
+	100%
+		transform: rotate(360deg)
+
 footer
 	background-color: $colorBack
 	color: white

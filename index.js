@@ -1,6 +1,11 @@
 
 // Is this a dev environment
 const __dev__ = true;
+console.debug = (str) => {
+	if(__dev__){
+		console.log(str);
+	}
+}
 
 // private info
 let fs = require('fs');
@@ -28,12 +33,14 @@ function sendPug(res, file, json) {
 
 // Make CSS from Css preprocessor
 let sass = require('sass');
-let sassNames = ['main.sass'];
+let sassNames = ['main.sass', 'index.sass'];
 function renderSass(css) {
 	if(__dev__){
-		const res = sass.renderSync({
+		// console.log(css);
+		let res = sass.renderSync({
 			file: "sass/" + css
 		});
+		// console.log(res.css.toString('utf-8'));
 		fs.writeFileSync("www/css/" + css.replace(".sass", ".css"), res.css);
 	}
 }
@@ -56,8 +63,10 @@ mongo.connect(url, (err, databases) => {
 
 	// Routing to pages
 	app.get("/", (req, res) => {
-		renderSass('main.sass');
-		sendPug(res, 'index.pug', {});
+		['main.sass', 'index.sass'].forEach(renderSass);
+		sendPug(res, 'index.pug', {
+			articles: ["DAS", "DA", "DADAD", "DASD", "DSA", "DASD", "FUXK"]
+		});
 	});
 
 	// Start the server
