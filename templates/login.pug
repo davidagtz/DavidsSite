@@ -7,11 +7,13 @@ block append content
 	form#login(action='/login')
 		h1 Login
 		div
+			- if(msg)
+				p.error #{msg}
 			p
-				label(for="user") Username:
+				label(for="user") Username: 
 				input(type="textbox" id="user" name="username")
 			p
-				label(for="password") Password:
+				label(for="password") Password: 
 				input(type="password" id="password" name="password")
 			br
 			input(type='submit' value="Login")

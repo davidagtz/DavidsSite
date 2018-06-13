@@ -13,16 +13,35 @@ const config = JSON.parse(fs.readFileSync('configurations.json', {
 	encoding : 'utf-8'
 }));
 
+// Used for connecting to the database
+const url = "mongodb://" + config.user + ":" + config.password + "@localhost:" + config.port + "/" + config.db;
+const assert = require('assert');
+const throws = assert.ifError;
+
 // Server Code
 const express = require('express');
 let app = express();
 app.use(express.static("www"));
 
 // MiddleWare stuff
+
 // Make Sessions
+
+// session store
 const session = require('express-session');
+let MongoDBStore = require('connect-mongodb-session')(session);
+let store = new MongoDBStore({
+	uri: url,
+	databaseName: config.db,
+	collection: 'store'
+});
+store.on('error', throws);
+
 app.use(session({
-	secret: config.secret
+	secret: config.secret,
+	saveUninitialized: true,
+	resave: true,
+	store: store
 }));
 
 // Initialize the template engine
@@ -33,8 +52,8 @@ let templates = {};
 templateNames.forEach((file) => {
 	templates[file] = pug.compileFile("templates/" + file);
 });
-function sendPug(res, file, json) {
-	if(__dev__)
+function sendPug(res, file, json, always = false) {
+	if(__dev__ || always)
 		templates[file] = pug.compileFile("templates/" + file);
 	res.send(templates[file](json));
 }
@@ -55,12 +74,8 @@ function renderSass(css) {
 }
 sassNames.forEach(renderSass);
 
-// just some functions
-const throws = (err) => {if(err) throw err};
-
 // Connect to Database
 const mdb = require('mongodb');
-const url = "mongodb://" + config.user + ":" + config.password + "@localhost:" + config.port + "/" + config.db;
 const mongo = mdb.MongoClient;
 mongo.connect(url, (err, databases) => {
 	throws(err);
@@ -77,13 +92,17 @@ mongo.connect(url, (err, databases) => {
 		['main.sass', 'index.sass'].forEach(renderSass);
 		sendPug(res, 'index.pug', {
 			articles: ["DAS", "DA", "DADAD", "DASD", "DSA", "DASD", "FUXK"]
-		});
+		}, true);
 	});
 
 	// login
 	app.get("/login", (req, res) => {
 		['main.sass'].forEach(renderSass);
-		sendPug(res, 'login.pug', {});
+		let sendmsg = null;
+		
+		sendPug(res, 'login.pug', {
+			msg : sendmsg
+		});
 	});
 
 	// 404 for unknown requests
