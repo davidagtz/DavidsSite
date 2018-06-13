@@ -4,13 +4,16 @@
   "description": "A portfolio",
   "main": "server.js",
   "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1",
-	"start" : "startMongo.bat && start node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "David Gutierrez",
   "license": "ISC",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1",
     "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "mongodb": "^3.0.10",
     "pug": "^2.0.3",
     "sass": "^1.5.1"

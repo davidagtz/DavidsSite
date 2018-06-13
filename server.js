@@ -8,19 +8,27 @@ console.debug = (str) => {
 }
 
 // private info
-let fs = require('fs');
+const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('configurations.json', {
 	encoding : 'utf-8'
 }));
 
 // Server Code
-let express = require('express');
+const express = require('express');
 let app = express();
 app.use(express.static("www"));
 
+// MiddleWare stuff
+// Make Sessions
+const session = require('express-session');
+app.use(session({
+	secret: config.secret
+}));
+
 // Initialize the template engine
-let pug = require('pug');
-let templateNames = ['index.pug'];
+const pug = require('pug');
+let templateNames = fs.readdirSync('templates');
+// let templateNames = ['index.pug'];
 let templates = {};
 templateNames.forEach((file) => {
 	templates[file] = pug.compileFile("templates/" + file);
@@ -32,8 +40,9 @@ function sendPug(res, file, json) {
 }
 
 // Make CSS from Css preprocessor
-let sass = require('sass');
-let sassNames = ['main.sass', 'index.sass'];
+const sass = require('sass');
+let sassNames = fs.readdirSync('sass');
+// let sassNames = ['main.sass', 'index.sass'];
 function renderSass(css) {
 	if(__dev__){
 		// console.log(css);
@@ -47,12 +56,12 @@ function renderSass(css) {
 sassNames.forEach(renderSass);
 
 // just some functions
-let throws = (err) => {if(err) throw err};
+const throws = (err) => {if(err) throw err};
 
 // Connect to Database
-let mdb = require('mongodb');
-const url = "mongodb://" + config.user + ":" + config.password + "@localhost/" + config.db;
-let mongo = mdb.MongoClient;
+const mdb = require('mongodb');
+const url = "mongodb://" + config.user + ":" + config.password + "@localhost:" + config.port + "/" + config.db;
+const mongo = mdb.MongoClient;
 mongo.connect(url, (err, databases) => {
 	throws(err);
 	
@@ -62,6 +71,8 @@ mongo.connect(url, (err, databases) => {
 	let db = databases.db(config.db);
 
 	// Routing to pages
+
+	// home
 	app.get("/", (req, res) => {
 		['main.sass', 'index.sass'].forEach(renderSass);
 		sendPug(res, 'index.pug', {
@@ -69,11 +80,18 @@ mongo.connect(url, (err, databases) => {
 		});
 	});
 
+	// login
+	app.get("/login", (req, res) => {
+		['main.sass'].forEach(renderSass);
+		sendPug(res, 'login.pug', {});
+	});
+
+	// 404 for unknown requests
 	app.all('*', (req, res) => {
 		res.sendStatus(404);
 	});
 
 	// Start the server
-	let port = process.env.port || 80
+	const port = process.env.port || 80;
 	app.listen(port, () => console.log("Listening on port " + port));
 });

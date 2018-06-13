@@ -9,10 +9,13 @@ $(document).ready(() => {
 				complete: (xhr, code) => {
 					console.log(xhr);
 					let status = xhr.status;
-					if(status == 404){
-						square.empty();
+					square.empty();
+					if(status == 404) {
 						square.append($("<h1>404</h1>"));
 						square.append($("<p>Page not found.</p>"))
+					}
+					else {
+						// ADD DETAILS< TITLE< AND IMAGE
 					}
 				}
 			})

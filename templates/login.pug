@@ -1,0 +1,17 @@
+extends template.pug
+
+block append head
+	link(rel='stylesheet' href='/css/login.css')
+
+block append content
+	form#login(action='/login')
+		h1 Login
+		div
+			p
+				label(for="user") Username:
+				input(type="textbox" id="user" name="username")
+			p
+				label(for="password") Password:
+				input(type="password" id="password" name="password")
+			br
+			input(type='submit' value="Login")
