@@ -26,7 +26,6 @@ app.use(express.static("www"));
 // MiddleWare stuff
 
 // Make Sessions
-
 // session store
 const session = require('express-session');
 let MongoDBStore = require('connect-mongodb-session')(session);
@@ -43,6 +42,10 @@ app.use(session({
 	resave: true,
 	store: store
 }));
+
+// Add cookie parser
+const cp = require('cookie-parser');
+app.use(cp());
 
 // Initialize the template engine
 const pug = require('pug');
@@ -95,14 +98,20 @@ mongo.connect(url, (err, databases) => {
 		}, true);
 	});
 
-	// login
+	// login page
 	app.get("/login", (req, res) => {
 		['main.sass'].forEach(renderSass);
 		let sendmsg = null;
-		
 		sendPug(res, 'login.pug', {
 			msg : sendmsg
 		});
+	});
+
+	// Authentication
+	app.get("/a", (req, res) => {
+		if(req.query.user && req.query.pwd) {
+			
+		}
 	});
 
 	// 404 for unknown requests
