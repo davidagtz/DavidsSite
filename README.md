@@ -2,10 +2,14 @@
 - The structure for configurations.json, an essential file is:
 	```json
 	{
-		"user"  : /* username for session */,
-		"password" : /* password for sessions */,
-		"db" : /* insert authentication database */,
-		"secret": /* insert secret for sessions */
+		"user"  : "username for session",
+		"password" : "password for sessions",
+		"db" : "insert authentication database",
+		"secret": "insert secret for sessions",
+		"collections" : ["optional",
+						 "array of ",
+						 "collections"],
+		"port" : "number for mongodb port",
 	}
 	```
 - This website is built off:

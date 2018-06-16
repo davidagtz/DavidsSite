@@ -4,16 +4,16 @@ block append head
 	link(rel='stylesheet' href='/css/login.css')
 
 block append content
-	form#login(action='/login')
+	form#login(action='/a')
 		h1 Login
 		div
 			- if(msg)
 				p.error #{msg}
 			p
 				label(for="user") Username: 
-				input(type="textbox" id="user" name="user")
+				input(type="textbox" id="user" name="user" required)
 			p
 				label(for="password") Password: 
-				input(type="password" id="password" name="pwd")
+				input(type="password" id="password" name="pwd" required)
 			br
 			input(type='submit' value="Login")

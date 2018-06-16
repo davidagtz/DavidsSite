@@ -18,6 +18,9 @@ const url = "mongodb://" + config.user + ":" + config.password + "@localhost:" +
 const assert = require('assert');
 const throws = assert.ifError;
 
+// Salt and Hash library
+const bcrypt = require('bcrypt');
+
 // Server Code
 const express = require('express');
 let app = express();
@@ -32,7 +35,7 @@ let MongoDBStore = require('connect-mongodb-session')(session);
 let store = new MongoDBStore({
 	uri: url,
 	databaseName: config.db,
-	collection: 'store'
+	collection: config.collections[0]
 });
 store.on('error', throws);
 
@@ -80,6 +83,9 @@ sassNames.forEach(renderSass);
 // Connect to Database
 const mdb = require('mongodb');
 const mongo = mdb.MongoClient;
+const articles = config.collections[1];
+const accounts = config.collections[2];
+const wrongUserOrPassword = "Wrong Username or Password";
 mongo.connect(url, (err, databases) => {
 	throws(err);
 	
@@ -101,7 +107,7 @@ mongo.connect(url, (err, databases) => {
 	// login page
 	app.get("/login", (req, res) => {
 		['main.sass'].forEach(renderSass);
-		let sendmsg = null;
+		let sendmsg = req.query.msg;
 		sendPug(res, 'login.pug', {
 			msg : sendmsg
 		});
@@ -110,9 +116,65 @@ mongo.connect(url, (err, databases) => {
 	// Authentication
 	app.get("/a", (req, res) => {
 		if(req.query.user && req.query.pwd) {
-			
+			db.collection(accounts).findOne({
+				"user" : req.query.user
+			})
+			.then((user) => {
+				if(user == null){
+					throw new Error(wrongUserOrPassword);
+				} 
+				else {
+					return bcrypt.compare(req.query.pwd, user.pwd);
+				}
+			})
+			.then((isSame) => {
+				if(isSame){
+					// res.setHeader("Set-Cookie", "s=" + user._id + ";" + stringify(req.cookies));
+					return db.collection(accounts).updateOne({
+						_id : user._id
+					},
+					{
+						$push : {
+							sessionIDs : req.sessionID
+						}	
+					})
+				}
+				else {
+					throw new Error(wrongUserOrPassword)
+				}
+			})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				switch (err.message) {
+					case wrongUserOrPassword:
+						loginMsg(res, err.message);
+						break;
+					default:
+						console.log(err);
+						res.status(500);
+						break;
+				}
+			});
+		}
+		else {
+			loginMsg(res, "Incomplete Username or Password fields");
 		}
 	});
+	// makes login display a message
+	function loginMsg(res, str){
+		res.redirect("/login?msg=" + str);
+	}
+	// takes cookie as a json object and makes it into a string
+	// following the key=value;key2=value2 format
+	function stringify(cookie) {
+		let out = "";
+		for(key in cookie){
+			out += key + "=" + cookie[key] + ";";
+		}
+		return out;
+	}
 
 	// 404 for unknown requests
 	app.all('*', (req, res) => {
