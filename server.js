@@ -147,14 +147,12 @@ mongo.connect(url, (err, databases) => {
 				console.log(res);
 			})
 			.catch((err) => {
-				switch (err.message) {
-					case wrongUserOrPassword:
-						loginMsg(res, err.message);
-						break;
-					default:
-						console.log(err);
-						res.status(500);
-						break;
+				if(err.message == wrongUserOrPassword){
+					loginMsg(res, err.message);
+				}
+				else{
+					console.log(err);
+					res.status(500);
 				}
 			});
 		}
@@ -163,11 +161,18 @@ mongo.connect(url, (err, databases) => {
 		}
 	});
 	// makes login display a message
-	function loginMsg(res, str){
-		res.redirect("/login?msg=" + str);
+	function loginMsg(res, str, options){
+		if(options == null)
+			options = {
+				msg: str
+			};
+		else
+			options['msg'] = str;
+		console.log(options, makeQuery("login", options))
+		res.redirect(makeQuery("login", options));
 	}
-	// takes cookie as a json object and makes it into a string
-	// following the key=value;key2=value2 format
+	/* takes cookie as a json object and makes it into a string
+	   following the key=value;key2=value2 format				*/
 	function stringify(cookie) {
 		let out = "";
 		for(key in cookie){
@@ -176,10 +181,76 @@ mongo.connect(url, (err, databases) => {
 		return out;
 	}
 
+	app.get("/signup", (req, res) => {
+		['main.sass'].forEach(renderSass);
+		sendPug(res, "signup.pug", {});
+	});
+	// Makes signup msg
+	function signupMsg(res, mes) {
+		res.redirect(makeQuery("signup", {
+			msg: mes
+		}));
+	}
+
+	app.get("/init", (req, res) => {
+		const pwd = req.query.pwd;
+		if(pwd.length < 7 && pwd.length > 72){
+			signupMsg(res, "Password length must be between 7 and 72 characters.");
+		}
+		const email = req.query.email;
+		const user = req.query.user;
+		loginMsg(res, "Success", {
+			isError: false
+		});
+	});
+
+	app.get("/exists", (req, res) => {
+		const type = req.query.type;
+		if(type){
+			if(type == "account"){
+				if(req.query.user)
+					db.collection(accounts).findOne({
+						"user" : req.query.user
+					})
+					.then((isThere) => {
+						res.send({
+							exists : isThere?true:false
+						});
+					})
+					.catch((err) => console.log(err));
+				else
+					res.send({
+						err: "No account specified"
+					});
+			}
+		}
+		else {
+			res.send({
+				err : "Type not specified"
+			});
+		}
+	});
+
 	// 404 for unknown requests
 	app.all('*', (req, res) => {
 		res.sendStatus(404);
 	});
+
+	/* makes query using json objects and url
+	   if only json is provided then it makes 
+	   only the query from ? 
+	   url must be string that does not start with / */
+	function makeQuery(url, json) {
+		if(json == null){
+			json = url;
+			url = "";
+		}
+		url += "?";
+		for(query in json)
+			url += query + "=" + json[query] + "&";
+		url = url.substring(0, url.length - 1);
+		return url;
+	}
 
 	// Start the server
 	const port = process.env.port || 80;

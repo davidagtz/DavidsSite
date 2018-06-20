@@ -1,0 +1,27 @@
+extends template.pug
+
+block append head
+	script(src="/js/signup.js")
+
+block append content
+	div.moveleft5
+		h1 Sign up
+		p.grey.moveleft5#req Passwords must be less than 72 characters and greater than 7 characters.
+		form.moveleft5#signup(action="/init")
+			p
+				label(for="user") Username: 
+				input(type="text" id="user" name="user" required)
+			p
+				label(for="pwd") Password: 
+				input(type="password" id="pwd" name="pwd" required)
+			p
+				label(for="pwdConfirm") Confirm Password: 
+				input(type="password" id="pwdConfirm" required)
+			p
+				label(for="email") Email: 
+				input(type="email" id="email" name="email" required)
+			p
+				label(for="emailConfirm") Confirm Email: 
+				input(type="email" id="emailConfirm" required)
+			p
+				button(onclick="validateForm()" type="button") Sign Up

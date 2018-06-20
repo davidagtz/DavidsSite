@@ -28,3 +28,11 @@
 	- Restart the database but this time by running `mongod --auth --port /* put port number here */`
 	- Run the main script with either `npm start` or `node server.js`
 - This Website was authored by David Gutierrez
+# API
+- ## Seeing if an account exists
+	- Accessing ```/exists?type=account&user=insertRandomUser``` where insertRandomUser is the desired user to verify will send a json object that looks like this
+	```json
+	{
+		"exists" : "boolean value of true or false"
+	}
+	```

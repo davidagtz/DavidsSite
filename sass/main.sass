@@ -4,10 +4,20 @@ $contentRight: 5%
 $marginBottom: 1%
 $colorBack: #919191
 	
+.moveleft5
+	margin-left: $padLeft
+
+.error
+	color: red
+
+.grey
+	color: $colorBack
+
 html, body
 	margin: 0
 	padding: 0
 	font-family: 'Roboto', sans-serif
+
 header
 	> h1
 		padding-left: $padLeft
@@ -56,20 +66,33 @@ footer
 	color: white
 	#info
 		height: 5%
-		padding-left: $padLeft
 		padding-top: $navUps
 		padding-bottom: $navUps
 		width: 100% - 2 * $padLeft
-		vertical-align: text-top
-		#authored
-			display: inline-block
-			vertical-align: top
+		table
 			height: 100%
-			p
-				margin: 0
-		#git
-			display: inline
-			a
+			display: inline-block
+			color: white
+			*
 				height: 100%
-				img
-					height: 100%
+				display: inline-block
+			tr
+				vertical-align: top
+			td
+				margin-top: auto
+				margin-bottom: auto
+				display: initial
+				a
+					width: 0
+		// #authored
+		// 	display: inline-block
+		// 	vertical-align: top
+		// 	height: 100%
+		// 	span
+		// 		padding-bottom: 10px
+		// #git
+		// 	display: inline
+		// 	a
+		// 		height: 100%
+		// 		img
+		// 			height: 100%

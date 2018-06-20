@@ -1,14 +1,12 @@
 extends template.pug
 
 block append head
-	link(rel='stylesheet' href='/css/login.css')
+	script(src="/js/login.js")
 
 block append content
-	form#login(action='/a')
+	form.moveleft5#login(action='/a')
 		h1 Login
-		div
-			- if(msg)
-				p.error #{msg}
+		div.moveleft5#thedeets
 			p
 				label(for="user") Username: 
 				input(type="textbox" id="user" name="user" required)
@@ -17,3 +15,5 @@ block append content
 				input(type="password" id="password" name="pwd" required)
 			br
 			input(type='submit' value="Login")
+		p Don't have an account? 
+			a(href="/signup") Sign up
