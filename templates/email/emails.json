@@ -1,0 +1,6 @@
+{
+	"welcome" : {
+		"html" : "welcome.pug",
+		"text" : "welcometxt.pug"
+	}
+}

@@ -3,7 +3,7 @@ $(document).ready(() => {
 	const query = getQueries();
 
 	if(query.msg){
-		let msg = $('<p class="error moveleft5"></p>');
+		let msg = $('<p class="error moveleft5" id="loaded-msg"></p>');
 		msg.text(query.msg);
 		$("#req").after(msg);
 	}
@@ -12,6 +12,7 @@ $(document).ready(() => {
 	const good = $("<img>");
 	good.attr("src", "/res/imgs/checkmark.png");
 	good.addClass("user");
+	good.addClass("remove");
 	good.css("height", $("#user").height());
 	good.css("margin-left", "2px");
 
@@ -20,10 +21,11 @@ $(document).ready(() => {
 		req = $.ajax("/exists", {
 			data: {
 				type: "account",
-				user: "hey"
+				user: $("#user").val()
 			},
 			success: (data) => {
 				if(data.exists){
+					$(".remove.user").remove();
 					show("user", "Username taken", {
 						class: "user"
 					});
@@ -55,6 +57,7 @@ function validateForm(){
 		show('pwd', 'Passwords do not match.');
 		isGood = false;
 	}
+
 	let email1 = $("#email").val();
 	let email2 = $("#emailConfirm").val();
 	
@@ -63,7 +66,13 @@ function validateForm(){
 		isGood = false;
 	}
 
-	console.log(isGood);
+	let nameFirst = $("#first").val();
+	if(nameFirst == ""){
+		show('last', 'Need a first name');
+		isGood = false;
+	}
+
+	$("#loaded-msg").remove();
 
 	if(isGood)
 		$("#signup").submit();

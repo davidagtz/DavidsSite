@@ -9,6 +9,11 @@ block append content
 		p.grey.moveleft5#req Passwords must be less than 72 characters and greater than 7 characters.
 		form.moveleft5#signup(action="/init")
 			p
+				label(for="name") Name: 
+				input(type="text" id="last" name="last" placeholder="Last Name (optional)")
+				| 
+				input(type="text" id="first" name="first" placeholder="First Name" required)
+			p
 				label(for="user") Username: 
 				input(type="text" id="user" name="user" required)
 			p
