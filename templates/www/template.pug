@@ -13,6 +13,7 @@ html
 			h1 #{title}
 			nav
 				- var tabs = [{name: "home", link: "/"}, {name: "login", link: "/login"}];
+				- tabs.push({name: "Welcome, " + user.first, link: "#"})
 				ul
 					- for(let i = 0; i < tabs.length; i++)
 						a(href=tabs[i].link)

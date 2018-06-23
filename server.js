@@ -49,6 +49,11 @@ app.use(session({
 	store: store
 }));
 
+// app.use((req, res, next) => {
+// 	console.log(req.session.user.user);
+// 	next();
+// })
+
 // Add cookie parser
 const cp = require('cookie-parser');
 app.use(cp());
@@ -60,9 +65,12 @@ let templates = {};
 templateNames.forEach((file) => {
 	templates[file] = pug.compileFile("templates/www/" + file);
 });
-function sendPug(res, file, json, always = false) {
+function sendPug(res, req, file, json, always = false) {
 	if(__dev__ || always)
 		templates[file] = pug.compileFile("templates/www/" + file);
+	if(req.session.user){
+		json.user = req.session.user.name;
+	}
 	res.send(templates[file](json));
 }
 const emailTemplateNames = JSON.parse(fs.readFileSync('templates/email/emails.json'));
@@ -136,9 +144,8 @@ mongo.connect(url, (err, databases) => {
 
 	// home
 	app.get("/", (req, res) => {
-		console.log(generateRandomString(10));
 		['main.sass', 'index.sass'].forEach(renderSass);
-		sendPug(res, 'index.pug', {
+		sendPug(res, req, 'index.pug', {
 			articles: ["DAS", "DA", "DADAD", "DASD", "DSA", "DASD", "FUXK"]
 		}, true);
 	});
@@ -147,7 +154,7 @@ mongo.connect(url, (err, databases) => {
 	app.get("/login", (req, res) => {
 		['main.sass'].forEach(renderSass);
 		let sendmsg = req.query.msg;
-		sendPug(res, 'login.pug', {
+		sendPug(res, req, 'login.pug', {
 			msg : sendmsg
 		});
 	});
@@ -171,15 +178,14 @@ mongo.connect(url, (err, databases) => {
 			.then((isSame) => {
 				if(isSame){
 					// res.setHeader("Set-Cookie", "s=" + user._id + ";" + stringify(req.cookies));
-					return pushSession(req, user);
+					loginMsg(res, "Successful login");
+					return pushSession(req, userjson);
 				}
 				else {
 					throw new Error(wrongUserOrPassword)
 				}
 			})
-			.then((res) => {
-				console.log(res);
-			})
+			.then((res) => {})
 			.catch((err) => {
 				if(err.message == wrongUserOrPassword){
 					loginMsg(res, err.message);
@@ -196,7 +202,9 @@ mongo.connect(url, (err, databases) => {
 	});
 	// push session to database
 	function pushSession(req, user) {
-		db.collection(accounts).updateOne({
+		req.session.user = user;
+		req.session.save(()=>{});
+		return db.collection(accounts).updateOne({
 			_id: user._id
 		},
 		{
@@ -228,7 +236,7 @@ mongo.connect(url, (err, databases) => {
 
 	app.get("/signup", (req, res) => {
 		['main.sass'].forEach(renderSass);
-		sendPug(res, "signup.pug", {});
+		sendPug(res, req, "signup.pug", {});
 	});
 	// Makes signup msg
 	function signupMsg(res, mes) {
