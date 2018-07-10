@@ -49,6 +49,14 @@ app.use(session({
 	store: store
 }));
 
+// body parser
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+// multipart
+const fileU = require('express-fileupload');
+app.use(fileU());
+
 // app.use((req, res, next) => {
 // 	console.log(req.session.user.user);
 // 	next();
@@ -60,14 +68,28 @@ app.use(cp());
 
 // Initialize the template engine
 const pug = require('pug');
-let templateNames = fs.readdirSync('templates/www');
 let templates = {};
-templateNames.forEach((file) => {
-	templates[file] = pug.compileFile("templates/www/" + file);
-});
+function compileFolder(folder){
+	let templateNames = fs.readdirSync(folder);
+	templateNames.forEach((file) => {
+		if(fs.lstatSync(folder + "/" + file).isDirectory())
+			compileFolder(folder + "/" + file + "/");
+		else {
+			let path = folder.substring('templates/www'.length);
+			templates[path + file] = pug.compileFile(folder + "/" + file);
+		}
+	});
+}
+compileFolder('templates/www');
 function sendPug(res, req, file, json, always = false) {
 	if(__dev__ || always)
 		templates[file] = pug.compileFile("templates/www/" + file);
+	if(typeof(json) == "boolean"){
+		always = json;
+		json = {};
+	}
+	if(!json)
+		json = {};
 	if(req.session.user){
 		json.user = req.session.user.name;
 	}
@@ -105,7 +127,6 @@ function sendEmail(name, json, callback) {
 
 // Make CSS from Css preprocessor
 const sass = require('sass');
-let sassNames = fs.readdirSync('sass');
 // let sassNames = ['main.sass', 'index.sass'];
 function renderSass(css) {
 	if(__dev__){
@@ -117,7 +138,23 @@ function renderSass(css) {
 		fs.writeFileSync("www/css/" + css.replace(".sass", ".css"), res.css);
 	}
 }
-sassNames.forEach(renderSass);
+function compileSassFolder(folder) {
+	let templateNames = fs.readdirSync(folder);
+	templateNames.forEach((file) => {
+		let path = folder.substring('sass'.length);
+		if (fs.lstatSync(folder + "/" + file).isDirectory()){
+			// console.log("./www/css" + path + "/" + file);
+			if(!fs.existsSync("./www/css/" + path + "/" + file)){
+				fs.mkdirSync("./www/css/" + path + "/" + file);
+			}
+			compileSassFolder(folder + "/" + file + "/");
+		}
+		else {
+			renderSass(path + "/" + file);
+		}
+	});
+}
+compileSassFolder('sass');
 
 // Set up email service
 const nodemailer = require('nodemailer');
@@ -158,13 +195,17 @@ mongo.connect(url, (err, databases) => {
 			msg : sendmsg
 		});
 	});
+	app.get("/logout", (req, res) => {
+		loginMsg(res, "Successfully logged out")
+		req.session.destroy(()=>{});
+	});
 
 	// Authentication
 	app.get("/a", (req, res) => {
 		if(req.query.user && req.query.pwd) {
 			let userjson;
 			db.collection(accounts).findOne({
-				"user" : req.query.user
+				"user" : req.query.user.toLowerCase()
 			})
 			.then((user) => {
 				if(user == null){
@@ -221,8 +262,8 @@ mongo.connect(url, (err, databases) => {
 			};
 		else
 			options['msg'] = str;
-		console.log(options, makeQuery("login", options))
-		res.redirect(makeQuery("login", options));
+		console.log(options, makeQuery("/login", options))
+		res.redirect(makeQuery("/login", options));
 	}
 	/* takes cookie as a json object and makes it into a string
 	   following the key=value;key2=value2 format				*/
@@ -245,25 +286,27 @@ mongo.connect(url, (err, databases) => {
 		}));
 	}
 
-	app.get("/init", (req, res) => {
-		const pwd = req.query.pwd;
+	app.post("/init", (req, res) => {
+		// console.log(req)
+		const pwd = req.body.pwd;
 		if(!pwd || (pwd.length < 7 && pwd.length > 72)){
+			console.log(req.body)
 			signupMsg(res, "Password length must be between 7 and 72 characters.");
 			return;
 		}
-		const email = req.query.email;
+		const email = req.body.email.toLowerCase();
 		if (!email || !email.match(/\w+@\w+\.\w+/)){
 			signupMsg(res, "Email is not present.");
 			return;
 		}
-		const user = req.query.user;
+		const user = req.body.user.toLowerCase();
 		if(!user){
 			signupMsg(res, "User name not valid.");
 			return;
 		}
 		const name = {
-			first: req.query.first,
-			last: req.query.last
+			first: req.body.first,
+			last: req.body.last
 		};
 		if(!name.first){
 			signupMsg(res, "First name must be present.");
@@ -346,13 +389,59 @@ mongo.connect(url, (err, databases) => {
 		return str.substring(2, 2 + len);
 	}
 
+	// Account information
+	app.get("/account", (req, res) => {
+		if(req.session.user) {
+			sendPug(res, req, "account.pug");
+		}
+		else {
+			loginMsg(res, "You must be logged in to perform this action.");
+		}
+	});
+
+	// article stuff
+	app.get("/articles/submit", (req, res) => {
+		['main.sass', '/articles/submit.sass'].forEach(renderSass);
+		sendPug(res, req, "/articles/submit.pug");
+	});
+	app.post("/articles/submit", (req, res) => {
+		['main.sass', '/articles/submit.sass'].forEach(renderSass);
+		const title = req.body.title;
+		const des = req.body.d;
+		const article = req.body.article;
+		const file = req.files.img;
+		let err = "";
+		if(!des)
+			err += "Description Missing. "
+		if(!title)
+			err += "Title Missing. "
+		if(!file)
+			err += "Image Missing. "
+		if(!article)
+			err += "Article Missing. "
+		successMsg(res, "Article Successfully Submited");
+	});
+
+	// generic success page
+	app.get('/success', (req, res) => {
+		sendPug(res, req, 'success.pug')
+	});
+	function successMsg(res, head, mes, options) {
+		let sendJson = {};
+		if(head)
+			sendJson.title = head;
+		if(mes)
+			sendJson.msg = mes;
+		res.redirect(makeQuery("/success", sendJson))
+	}
+
 	app.get("/exists", (req, res) => {
 		const type = req.query.type;
 		if(type){
 			if(type == "account"){
 				if(req.query.user)
 					db.collection(accounts).findOne({
-						"user" : req.query.user
+						"user" : req.query.user.toLowerCase()
 					})
 					.then((isThere) => {
 						res.send({

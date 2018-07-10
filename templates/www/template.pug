@@ -12,12 +12,19 @@ html
 		header
 			h1 #{title}
 			nav
-				- var tabs = [{name: "home", link: "/"}, {name: "login", link: "/login"}];
-				- tabs.push({name: "Welcome, " + user.first, link: "#"})
+				- var tabs = [{name: "home", link: "/"}, {name: "login", link: "/login"}, {name: "submit article", link: "/articles/submit"}];
+				- if(user)
+					- tabs.push({name: "welcome, " + user.first, link: "/account", more: [{name: "Logout", link: "/logout"}]})
 				ul
 					- for(let i = 0; i < tabs.length; i++)
-						a(href=tabs[i].link)
+						div
+							a(href=tabs[i].link)
 								li #{tabs[i].name}
+									//- - if(tabs[i].more)
+									//- 	ul.dropdown
+									//- 		- for(let j = 0; j < tabs[i].more.length; j++)
+									//- 			a(href=tabs[i].more[j].link)
+									//- 				li #{tabs[i].more[j].name}
 		#content
 			block content
 		footer

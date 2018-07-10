@@ -1,3 +1,22 @@
+(function ($) {
+	$.fn.src = function(src){
+		console.log(this);
+		this.attr('src', src);
+	};
+
+	$.create = function(str, obj) {
+		let created =  $(document.createElement(str));	
+		if(obj) {
+			if(obj.inner){
+				created.html(obj.inner);
+			}
+		}
+		return created;
+	}
+
+}(jQuery));
+
+
 function getQueries() {
 	let query = {};
 	let index = window.location.href.indexOf("?");

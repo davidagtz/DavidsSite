@@ -1,0 +1,9 @@
+extends template.pug
+
+block append content
+	.moveleft5
+		h1 Account Settings
+		.moveleft5
+			p Hello, #{user.first}!
+			a(href="/logout")
+				button(type="button") Logout
