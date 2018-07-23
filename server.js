@@ -338,7 +338,8 @@ mongo.connect(url, (err, databases) => {
 				"pwd": hash,
 				"email": email,
 				"activated": false,
-				"name" : name
+				"name" : name,
+				"articles" : []
 			});
 		})
 		.then(r => {
@@ -375,6 +376,7 @@ mongo.connect(url, (err, databases) => {
 				}
 			})
 			.then(r => {
+				req.session.user.activated = true;
 				loginMsg(res, "Successfully authenticated the account");
 				delete activations[req.params.act];
 			})
@@ -406,20 +408,52 @@ mongo.connect(url, (err, databases) => {
 	});
 	app.post("/articles/submit", (req, res) => {
 		['main.sass', '/articles/submit.sass'].forEach(renderSass);
+
 		const title = req.body.title;
 		const des = req.body.d;
 		const article = req.body.article;
 		const file = req.files.img;
-		let err = "";
+
+		let err = '';
 		if(!des)
-			err += "Description Missing. "
+			err += 'Description Missing. ';
 		if(!title)
-			err += "Title Missing. "
+			err += 'Title Missing. ';
 		if(!file)
-			err += "Image Missing. "
+			err += 'Image Missing. ';
 		if(!article)
-			err += "Article Missing. "
-		successMsg(res, "Article Successfully Submited");
+			err += 'Article Missing. ';
+		if(!req.session.user)
+			err += 'Not Logged In';
+		else if(!req.session.user.activated)
+			err += 'Account not Activated';
+
+		if(err != ''){
+			errMsg(res, 'Errors present', err);
+		}
+		else {
+			let length = 6;
+			let id = generateRandomString(length);
+			let path = 'www/res/userData/' + req.session.user.user + '/articles/';
+			while(fs.lstatSync(path + id).isDirectory()){
+				id = generateRandomString(length);
+			}
+			fs.mkdir(path + id)
+			.then(() => {
+				return db.collection(articles).insertOne({
+					'title' : title,
+					'description' : des,
+					'id' : id,
+
+				});
+			})
+			.then(() => {
+
+				file.mv()
+			})
+			.catch(err => console.log(err));
+			successMsg(res, 'Article Successfully Submited');
+		}
 	});
 
 	// generic success page
@@ -432,10 +466,18 @@ mongo.connect(url, (err, databases) => {
 			sendJson.title = head;
 		if(mes)
 			sendJson.msg = mes;
-		res.redirect(makeQuery("/success", sendJson))
+		for(key in options){
+			sendJson[key] = options[key];
+		}
+		res.redirect(makeQuery('/success', sendJson))
+	}
+	function errMsg(res, head, mes, options) {
+		successMsg(res, head, mes, {
+			isError : true
+		});
 	}
 
-	app.get("/exists", (req, res) => {
+	app.get('/exists', (req, res) => {
 		const type = req.query.type;
 		if(type){
 			if(type == "account"){

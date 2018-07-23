@@ -1,27 +1,35 @@
 extends ../template.pug
 
 block append head
-	script(src="/js/articles/submit.js")
-	link(rel="stylesheet", href="/css/articles/submit.css")
+	script(src='/js/articles/submit.js')
+	link(rel='stylesheet', href='/css/articles/submit.css')
 
 block append content
 	h1 Submit Article
-	form(id="submit" method="post" enctype="multipart/form-data").moveleft5
+	form(id='submit' method='post' enctype='multipart/form-data').moveleft5
 		.ib.top
 			p
-				label(for="title") article title: 
-				input(type="title" id="title" name="title" placeholder=" title" required)
+				label(for='title') article title: 
+				input#title(type='title' name='title' placeholder=' title' required)
 			p
-				label(for="description") description: 
-				input(type="description" id="description" name="d" placeholder=" description" required)
+				label(for='description') description: 
+				input#description(type='description' name='d' placeholder=' description' required)
 			p
-				label(for="article") article: 
-				textarea(name="article", cols="30", rows="10" required).top
+				label(for='article') article: 
+				textarea#article(name='article' cols='30' rows='10' required).top
 			p
-				input(type="submit" value="submit")
+				input(type='submit' value='submit')
 		.ib.top#side
 			p
-				label(for="file") Upload Image
-				br
-				input(type='file' id="file" name='img' value='Upload Image' accept="image/*" required)
-				img(id="filePreview")
+				label(for='file') Upload Preview Image 
+				input#file(type='file' name='img' value='Upload Image' accept='image/*' required)
+				img.preview(id='filePreview')
+			p
+				p Upload Article Images
+				p.subtitle To use these photos in the article you must put a ! before the img num
+				#listCont
+					ul#thelist
+					#buttonHolder
+						button(type="button" onclick="addItem()") add
+	#preview
+				

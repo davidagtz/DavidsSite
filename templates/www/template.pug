@@ -12,9 +12,11 @@ html
 		header
 			h1 #{title}
 			nav
-				- var tabs = [{name: "home", link: "/"}, {name: "login", link: "/login"}, {name: "submit article", link: "/articles/submit"}];
-				- if(user)
-					- tabs.push({name: "welcome, " + user.first, link: "/account", more: [{name: "Logout", link: "/logout"}]})
+				- var tabs = [{name: "home", link: "/"}, {name: "login", link: "/login"}];
+				- if(user){
+					- tabs.push({name: "submit article", link: "/articles/submit"})
+					- tabs.push({name: "welcome, " + user.first, link: "/account", more: [{name: "Logout", link: "/logouts"}]})
+				- }
 				ul
 					- for(let i = 0; i < tabs.length; i++)
 						div
