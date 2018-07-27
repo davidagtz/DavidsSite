@@ -1,6 +1,8 @@
 extends ../template.pug
 
 block append head
+	script(src='/js/articles/ImgButtonBar.js')
+	script(src='/js/articles/Preview.js')
 	script(src='/js/articles/submit.js')
 	link(rel='stylesheet', href='/css/articles/submit.css')
 
@@ -31,5 +33,6 @@ block append content
 					ul#thelist
 					#buttonHolder
 						button(type="button" onclick="addItem()") add
-	#preview
-				
+	#previewCont
+		h2 Preview
+		#preview

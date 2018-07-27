@@ -13,3 +13,49 @@
 .subtitle
 	font-size: .7em
 	margin-top: -1em
+
+.default
+	height: 5em
+	z-index: -1
+	position: relative
+
+$height: 2em
+$butHeight: 80%
+
+%imgEditButton
+	height: $butHeight
+	margin-top: 50% - $butHeight / 2
+	width: $butHeight
+	margin-left: 50% - $butHeight / 2
+	background-size: cover
+	
+
+.imgEdit
+	$radius: 1em
+	width: 2 * $height
+	height: $height
+	background-color: #bbb
+	margin-left: auto
+	margin-right: auto
+	margin-top: -$height
+	position: relative
+	border-top-left-radius: $radius
+	border-top-right-radius: $radius
+	box-shadow: 0 0 3px black
+	.right, .left
+		display: inline-block
+		width: 50%
+		height: 100%
+		&:hover
+			background-color: #999
+	.right
+		border-top-right-radius: $radius
+	.left
+		border-top-left-radius: $radius
+	.gro
+		@extend %imgEditButton
+		background-image: url('/res/imgs/articles/add.png')
+	.shr
+		@extend %imgEditButton
+		background-image: url('/res/imgs/articles/del.png')
+		margin-left: 50% - $butHeight / 2

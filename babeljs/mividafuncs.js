@@ -1,10 +1,11 @@
-(function ($) {
-	$.fn.src = function (src) {
+(function($) {
+	$.fn.src = function(src) {
 		// console.log(this);
-		if (!src) return this.attr('src');else return this.attr('src', src);
+		if (!src) return this.attr('src');
+		else return this.attr('src', src);
 	};
 
-	$.create = function (str, obj) {
+	$.create = function(str, obj) {
 		let created = $(document.createElement(str));
 		if (obj) {
 			if (obj.inner) {
